@@ -3,32 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="TradingGab - Tableau de bord de trading en temps réel">
-    <meta name="keywords" content="trading, crypto, bourse, marché, investissement">
     <title>TradingGab — Tableau de bord de marché</title>
     
-    <!-- Fonts -->
+    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --primary: #6366f1;
-            --primary-dark: #4f46e5;
             --secondary: #10b981;
             --danger: #ef4444;
             --dark: #0f172a;
             --dark-light: #1e293b;
             --gray: #64748b;
-            --light: #f1f5f9;
             --white: #ffffff;
             --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         }
@@ -70,7 +63,6 @@
             background: var(--gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .logo i {
@@ -80,28 +72,7 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--gray);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: var(--white);
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
+        .nav-actions { display: flex; gap: 1rem; }
 
         .btn {
             padding: 0.625rem 1.25rem;
@@ -113,49 +84,17 @@
             font-size: 0.875rem;
         }
 
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .btn-primary {
-            background: var(--gradient);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
-        }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: var(--white); }
+        .btn-primary { background: var(--gradient); color: var(--white); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); }
 
         /* Main Content */
-        main {
-            margin-top: 80px;
-            padding: 2rem;
-            max-width: 1400px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+        main { margin-top: 80px; padding: 2rem; max-width: 1400px; margin-left: auto; margin-right: auto; }
 
-        /* Welcome Section */
-        .welcome-section {
-            margin-bottom: 2rem;
-        }
-
-        .welcome-section h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .welcome-section p {
-            color: var(--gray);
-        }
+        .welcome-section { margin-bottom: 2rem; }
+        .welcome-section h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .welcome-section p { color: var(--gray); }
 
         /* Stats Grid */
         .stats-grid {
@@ -173,73 +112,37 @@
             transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
 
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .stat-title {
-            color: var(--gray);
-            font-size: 0.875rem;
-        }
-
+        .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .stat-title { color: var(--gray); font-size: 0.875rem; }
+        
         .stat-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
+            width: 40px; height: 40px; border-radius: 0.5rem;
+            display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+        }
+        .stat-icon.blue { background: rgba(99, 102, 241, 0.2); color: var(--primary); }
+        .stat-icon.green { background: rgba(16, 185, 129, 0.2); color: var(--secondary); }
+
+        .stat-value { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .stat-change { font-size: 0.875rem; display: flex; align-items: center; gap: 0.25rem; }
+        .positive { color: var(--secondary); }
+        .negative { color: var(--danger); }
+
+        /* Chart Section */
+        .chart-container {
+            background: var(--dark-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            height: 400px;
+            position: relative;
         }
 
-        .stat-icon.blue {
-            background: rgba(99, 102, 241, 0.2);
-            color: var(--primary);
-        }
-
-        .stat-icon.green {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--secondary);
-        }
-
-        .stat-icon.red {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger);
-        }
-
-        .stat-icon.purple {
-            background: rgba(139, 92, 246, 0.2);
-            color: #8b5cf6;
-        }
-
-        .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-change {
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .positive {
-            color: var(--secondary);
-        }
-
-        .negative {
-            color: var(--danger);
-        }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .chart-title { font-size: 1.25rem; font-weight: 600; }
+        .chart-subtitle { color: var(--gray); font-size: 0.875rem; }
 
         /* Market Section */
         .market-section {
@@ -250,22 +153,10 @@
             margin-bottom: 2rem;
         }
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .section-title { font-size: 1.25rem; font-weight: 600; }
 
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .search-box {
-            position: relative;
-        }
-
+        .search-box { position: relative; }
         .search-box input {
             background: var(--dark);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -276,179 +167,45 @@
             outline: none;
             transition: border-color 0.3s;
         }
+        .search-box input:focus { border-color: var(--primary); }
+        .search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gray); }
 
-        .search-box input:focus {
-            border-color: var(--primary);
-        }
+        /* Table */
+        .market-table { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        th { text-align: left; padding: 1rem; color: var(--gray); font-weight: 500; font-size: 0.875rem; }
+        td { padding: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; transition: background 0.2s; }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
-        .search-box i {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-        }
-
-        /* Market Table */
-        .market-table {
-            width: 100%;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        th {
-            text-align: left;
-            padding: 1rem;
-            color: var(--gray);
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        tr:hover {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .coin-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .coin-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.25rem;
-        }
-
-        .coin-icon.btc {
-            background: linear-gradient(135deg, #f7931a 0%, #ffb347 100%);
-        }
-
-        .coin-icon.eth {
-            background: linear-gradient(135deg, #627eea 0%, #8a92b2 100%);
-        }
-
-        .coin-icon.usdt {
-            background: linear-gradient(135deg, #26a17b 0%, #1aa097 100%);
-        }
-
-        .coin-icon.bnb {
-            background: linear-gradient(135deg, #f3ba2f 0%, #f0b90b 100%);
-        }
-
-        .coin-name {
-            font-weight: 600;
-        }
-
-        .coin-symbol {
-            color: var(--gray);
-            font-size: 0.875rem;
-        }
-
-        .price {
-            font-weight: 600;
-        }
-
+        .coin-info { display: flex; align-items: center; gap: 1rem; }
+        .coin-icon { width: 32px; height: 32px; border-radius: 50%; }
+        .coin-name { font-weight: 600; }
+        .coin-symbol { color: var(--gray); font-size: 0.875rem; text-transform: uppercase; }
+        .price { font-weight: 600; }
+        
         .change-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.375rem;
-            font-weight: 600;
-            font-size: 0.875rem;
+            padding: 0.25rem 0.75rem; border-radius: 0.375rem;
+            font-weight: 600; font-size: 0.875rem;
         }
-
-        .change-badge.positive {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--secondary);
-        }
-
-        .change-badge.negative {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger);
-        }
-
-        /* Chart Placeholder */
-        .chart-container {
-            background: var(--dark-light);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .chart-placeholder {
-            text-align: center;
-            color: var(--gray);
-        }
-
-        .chart-placeholder i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
+        .change-badge.positive { background: rgba(16, 185, 129, 0.2); color: var(--secondary); }
+        .change-badge.negative { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
 
         /* Loading Screen */
         .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--dark);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 9999;
             transition: opacity 0.5s;
         }
-
-        .loading-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
+        .loading-screen.hidden { opacity: 0; pointer-events: none; }
         .loader {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(99, 102, 241, 0.2);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+            width: 60px; height: 60px;
+            border: 4px solid rgba(99, 102, 241, 0.2); border-top-color: var(--primary);
+            border-radius: 50%; animation: spin 1s linear infinite;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            margin-top: 1.5rem;
-            font-size: 1.125rem;
-            color: var(--gray);
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { margin-top: 1.5rem; font-size: 1.125rem; color: var(--gray); }
 
         /* Footer */
         footer {
@@ -462,37 +219,9 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .search-box input {
-                width: 200px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            main {
-                padding: 1rem;
-            }
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .stat-card, .market-section, .chart-container {
-            animation: fadeIn 0.6s ease-out;
+            .search-box input { width: 100%; }
+            .stats-grid { grid-template-columns: 1fr; }
+            main { padding: 1rem; }
         }
     </style>
 </head>
@@ -500,7 +229,7 @@
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loader"></div>
-        <p class="loading-text">Chargement de TradingGab…</p>
+        <p class="loading-text">Connexion aux marchés en temps réel…</p>
     </div>
 
     <!-- Header -->
@@ -510,12 +239,6 @@
                 <i class="fas fa-chart-line"></i>
                 <span>TradingGab</span>
             </div>
-            <ul class="nav-links">
-                <li><a href="#dashboard">Tableau de bord</a></li>
-                <li><a href="#markets">Marchés</a></li>
-                <li><a href="#portfolio">Portfolio</a></li>
-                <li><a href="#actualites">Actualités</a></li>
-            </ul>
             <div class="nav-actions">
                 <button class="btn btn-outline">Connexion</button>
                 <button class="btn btn-primary">S'inscrire</button>
@@ -525,84 +248,65 @@
 
     <!-- Main Content -->
     <main>
-        <!-- Welcome Section -->
         <div class="welcome-section">
             <h1>Bienvenue sur TradingGab 👋</h1>
-            <p>Suivez vos investissements en temps réel</p>
+            <p>Suivez les cryptomonnaies en temps réel</p>
         </div>
 
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-title">Solde Total</span>
-                    <div class="stat-icon blue">
-                        <i class="fas fa-wallet"></i>
-                    </div>
+                    <span class="stat-title">Bitcoin (BTC)</span>
+                    <div class="stat-icon blue"><i class="fab fa-bitcoin"></i></div>
                 </div>
-                <div class="stat-value">$24,562.00</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>+12.5% ce mois</span>
-                </div>
+                <div class="stat-value" id="btcPrice">Chargement...</div>
+                <div class="stat-change" id="btcChange">--</div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-title">Profit/Perte</span>
-                    <div class="stat-icon green">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
+                    <span class="stat-title">Ethereum (ETH)</span>
+                    <div class="stat-icon blue"><i class="fab fa-ethereum"></i></div>
                 </div>
-                <div class="stat-value">+$3,245.80</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>+8.2% cette semaine</span>
-                </div>
+                <div class="stat-value" id="ethPrice">Chargement...</div>
+                <div class="stat-change" id="ethChange">--</div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-title">Actifs</span>
-                    <div class="stat-icon purple">
-                        <i class="fas fa-coins"></i>
-                    </div>
+                    <span class="stat-title">Actifs suivis</span>
+                    <div class="stat-icon green"><i class="fas fa-eye"></i></div>
                 </div>
-                <div class="stat-value">12</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-plus"></i>
-                    <span>+2 ce mois</span>
-                </div>
+                <div class="stat-value">10</div>
+                <div class="stat-change positive"><i class="fas fa-arrow-up"></i><span>Top 10 mondial</span></div>
             </div>
 
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-title">Transactions</span>
-                    <div class="stat-icon red">
-                        <i class="fas fa-exchange-alt"></i>
-                    </div>
+                    <span class="stat-title">Volume 24h Global</span>
+                    <div class="stat-icon green"><i class="fas fa-chart-bar"></i></div>
                 </div>
-                <div class="stat-value">847</div>
-                <div class="stat-change negative">
-                    <i class="fas fa-arrow-down"></i>
-                    <span>-5% ce mois</span>
-                </div>
+                <div class="stat-value" id="globalVolume">Chargement...</div>
+                <div class="stat-change positive"><i class="fas fa-bolt"></i><span>Temps réel</span></div>
             </div>
         </div>
 
         <!-- Chart Section -->
         <div class="chart-container">
-            <div class="chart-placeholder">
-                <i class="fas fa-chart-area"></i>
-                <h3>Graphique de Performance</h3>
-                <p>Intégrez Chart.js ou TradingView ici</p>
+            <div class="chart-header">
+                <div>
+                    <h2 class="chart-title" id="chartTitle">Évolution du Bitcoin (7 jours)</h2>
+                    <p class="chart-subtitle">Cliquez sur une crypto dans le tableau pour changer le graphique</p>
+                </div>
             </div>
+            <canvas id="priceChart"></canvas>
         </div>
 
         <!-- Market Section -->
-        <div class="market-section" id="markets">
+        <div class="market-section">
             <div class="section-header">
-                <h2 class="section-title">Marchés Populaires</h2>
+                <h2 class="section-title">Top 10 des Cryptomonnaies</h2>
                 <div class="search-box">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Rechercher un actif..." id="searchInput">
@@ -613,79 +317,16 @@
                 <table>
                     <thead>
                         <tr>
+                            <th>#</th>
                             <th>Actif</th>
                             <th>Prix</th>
                             <th>24h %</th>
                             <th>Capitalisation</th>
                             <th>Volume 24h</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="marketTable">
-                        <tr>
-                            <td>
-                                <div class="coin-info">
-                                    <div class="coin-icon btc"></div>
-                                    <div>
-                                        <div class="coin-name">Bitcoin</div>
-                                        <div class="coin-symbol">BTC</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="price">$43,256.00</td>
-                            <td><span class="change-badge positive">+2.4%</span></td>
-                            <td>$846.2B</td>
-                            <td>$28.4B</td>
-                            <td><button class="btn btn-primary">Trader</button></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="coin-info">
-                                    <div class="coin-icon eth">Ξ</div>
-                                    <div>
-                                        <div class="coin-name">Ethereum</div>
-                                        <div class="coin-symbol">ETH</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="price">$2,284.50</td>
-                            <td><span class="change-badge positive">+3.1%</span></td>
-                            <td>$274.5B</td>
-                            <td>$15.2B</td>
-                            <td><button class="btn btn-primary">Trader</button></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="coin-info">
-                                    <div class="coin-icon usdt">₮</div>
-                                    <div>
-                                        <div class="coin-name">Tether</div>
-                                        <div class="coin-symbol">USDT</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="price">$1.00</td>
-                            <td><span class="change-badge negative">-0.01%</span></td>
-                            <td>$95.8B</td>
-                            <td>$42.1B</td>
-                            <td><button class="btn btn-primary">Trader</button></td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="coin-info">
-                                    <div class="coin-icon bnb">B</div>
-                                    <div>
-                                        <div class="coin-name">BNB</div>
-                                        <div class="coin-symbol">BNB</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="price">$312.45</td>
-                            <td><span class="change-badge positive">+1.8%</span></td>
-                            <td>$48.2B</td>
-                            <td>$1.8B</td>
-                            <td><button class="btn btn-primary">Trader</button></td>
-                        </tr>
+                        <!-- Les données seront insérées ici par JavaScript -->
                     </tbody>
                 </table>
             </div>
@@ -705,60 +346,165 @@
     </footer>
 
     <script>
-        // Hide loading screen
+        let chartInstance = null;
+        let allCoinsData = [];
+
+        // Cacher l'écran de chargement
         window.addEventListener('load', () => {
             setTimeout(() => {
                 document.getElementById('loadingScreen').classList.add('hidden');
-            }, 1500);
+            }, 1000);
+            fetchMarketData();
         });
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#marketTable tr');
+        // Récupérer les données de l'API CoinGecko
+        async function fetchMarketData() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=true');
+                const data = await response.json();
+                allCoinsData = data;
+                
+                updateStats(data);
+                renderTable(data);
+                initChart(data[0]);
+            } catch (error) {
+                console.error('Erreur API:', error);
+                document.getElementById('loadingScreen').innerHTML = '<p style="color:var(--danger)">Erreur de connexion à l\'API. Rechargez la page.</p>';
+            }
+        }
+
+        // Mettre à jour les cartes de statistiques
+        function updateStats(data) {
+            const btc = data.find(c => c.symbol === 'btc');
+            const eth = data.find(c => c.symbol === 'eth');
             
-            rows.forEach(row => {
-                const coinName = row.querySelector('.coin-name').textContent.toLowerCase();
-                const coinSymbol = row.querySelector('.coin-symbol').textContent.toLowerCase();
+            if(btc) {
+                document.getElementById('btcPrice').textContent = formatCurrency(btc.current_price);
+                updateChangeIndicator('btcChange', btc.price_change_percentage_24h);
+            }
+            if(eth) {
+                document.getElementById('ethPrice').textContent = formatCurrency(eth.current_price);
+                updateChangeIndicator('ethChange', eth.price_change_percentage_24h);
+            }
+
+            const totalVolume = data.reduce((sum, coin) => sum + coin.total_volume, 0);
+            document.getElementById('globalVolume').textContent = '$' + (totalVolume / 1e9).toFixed(2) + 'B';
+        }
+
+        // Afficher le tableau
+        function renderTable(data) {
+            const tbody = document.getElementById('marketTable');
+            tbody.innerHTML = '';
+
+            data.forEach((coin, index) => {
+                const changeClass = coin.price_change_percentage_24h >= 0 ? 'positive' : 'negative';
+                const changeIcon = coin.price_change_percentage_24h >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
                 
-                if (coinName.includes(searchTerm) || coinSymbol.includes(searchTerm)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
+                const tr = document.createElement('tr');
+                tr.onclick = () => updateChart(coin);
+                tr.innerHTML = `
+                    <td>${coin.market_cap_rank}</td>
+                    <td>
+                        <div class="coin-info">
+                            <img src="${coin.image}" alt="${coin.name}" class="coin-icon">
+                            <div>
+                                <div class="coin-name">${coin.name}</div>
+                                <div class="coin-symbol">${coin.symbol}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="price">${formatCurrency(coin.current_price)}</td>
+                    <td><span class="change-badge ${changeClass}"><i class="fas ${changeIcon}"></i> ${Math.abs(coin.price_change_percentage_24h).toFixed(2)}%</span></td>
+                    <td>$${(coin.market_cap / 1e9).toFixed(2)}B</td>
+                    <td>$${(coin.total_volume / 1e9).toFixed(2)}B</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Initialiser le graphique Chart.js
+        function initChart(coin) {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            const prices = coin.sparkline_in_7d.price;
+            const labels = prices.map((_, i) => `J${Math.floor(i / 24)}`);
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.5)');
+            gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `Prix ${coin.symbol.toUpperCase()} (USD)`,
+                        data: prices,
+                        borderColor: '#6366f1',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: { 
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#64748b' }
+                        }
+                    }
                 }
             });
+        }
+
+        // Mettre à jour le graphique au clic
+        function updateChart(coin) {
+            document.getElementById('chartTitle').textContent = `Évolution du ${coin.name} (7 jours)`;
+            
+            const prices = coin.sparkline_in_7d.price;
+            chartInstance.data.datasets[0].data = prices;
+            chartInstance.data.datasets[0].label = `Prix ${coin.symbol.toUpperCase()} (USD)`;
+            
+            const isPositive = prices[prices.length - 1] >= prices[0];
+            const color = isPositive ? '#10b981' : '#ef4444';
+            chartInstance.data.datasets[0].borderColor = color;
+            
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, isPositive ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)');
+            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+            chartInstance.data.datasets[0].backgroundColor = gradient;
+
+            chartInstance.update();
+        }
+
+        // Recherche dynamique
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            const filtered = allCoinsData.filter(c => 
+                c.name.toLowerCase().includes(term) || c.symbol.toLowerCase().includes(term)
+            );
+            renderTable(filtered);
         });
 
-        // Simulate real-time price updates
-        setInterval(() => {
-            const prices = document.querySelectorAll('.price');
-            prices.forEach(price => {
-                const currentPrice = parseFloat(price.textContent.replace(/[$,]/g, ''));
-                const change = (Math.random() - 0.5) * 100;
-                const newPrice = currentPrice + change;
-                price.textContent = '$' + newPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                
-                // Flash effect
-                price.style.color = change > 0 ? '#10b981' : '#ef4444';
-                setTimeout(() => {
-                    price.style.color = '';
-                }, 1000);
-            });
-        }, 5000);
+        // Utilitaires
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+        }
 
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
+        function updateChangeIndicator(id, value) {
+            const el = document.getElementById(id);
+            const isPos = value >= 0;
+            el.className = `stat-change ${isPos ? 'positive' : 'negative'}`;
+            el.innerHTML = `<i class="fas ${isPos ? 'fa-arrow-up' : 'fa-arrow-down'}"></i><span>${isPos ? '+' : ''}${value.toFixed(2)}% (24h)</span>`;
+        }
     </script>
 </body>
-			</html>
+</html>
